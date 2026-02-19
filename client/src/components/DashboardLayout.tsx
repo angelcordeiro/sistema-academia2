@@ -64,12 +64,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           })}
         </nav>
 
-        {/* Footer */}
-        <div className="p-4 border-t-4 border-sidebar-border">
-          <p className="text-xs text-muted-foreground text-center">
-            Sprint 2 - Sistema Academia
-          </p>
-        </div>
+
       </aside>
 
       {/* Main Content */}
