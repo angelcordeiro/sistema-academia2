@@ -8,6 +8,7 @@ import Home from "./pages/Home";
 import Alunos from "./pages/Alunos";
 import PerfilAluno from "./pages/PerfilAluno";
 import Professores from "./pages/Professores";
+import PerfilProfessor from "./pages/PerfilProfessor";
 import Treinos from "./pages/Treinos";
 
 function Router() {
@@ -17,6 +18,7 @@ function Router() {
       <Route path="/alunos" component={Alunos} />
       <Route path="/alunos/:id" component={PerfilAluno} />
       <Route path="/professores" component={Professores} />
+      <Route path="/professores/:id" component={PerfilProfessor} />
       <Route path="/treinos" component={Treinos} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />

@@ -1,6 +1,6 @@
 /**
  * Professores - G1-9: Cadastro Professor + G1-12: Edição/Exclusão Cadastro
- * CRUD completo de professores
+ * CRUD completo de professores com campos expandidos
  */
 
 import DashboardLayout from "@/components/DashboardLayout";
@@ -8,6 +8,14 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Dialog,
   DialogContent,
@@ -25,18 +33,33 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Plus, Pencil, Trash2, GraduationCap } from "lucide-react";
+import { Plus, Pencil, Trash2, GraduationCap, Eye } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { Link } from "wouter";
 
 interface Professor {
   id: string;
   nome: string;
   cpf: string;
+  dataNascimento: string;
+  sexo: string;
   especialidade: string;
   telefone: string;
   email: string;
   cref: string;
+  regimeContratacao: string;
+  dataAdmissao: string;
+  salario: number;
+  horarioInicio: string;
+  horarioFim: string;
+  diasAtendimento: string[];
+  formacao: string;
+  experiencia: string;
+  certificacoes: string;
+  endereco: string;
+  emergenciaContato: string;
+  emergenciaTelefone: string;
 }
 
 export default function Professores() {
@@ -48,10 +71,24 @@ export default function Professores() {
   const [formData, setFormData] = useState<Omit<Professor, "id">>({
     nome: "",
     cpf: "",
+    dataNascimento: "",
+    sexo: "",
     especialidade: "",
     telefone: "",
     email: "",
     cref: "",
+    regimeContratacao: "",
+    dataAdmissao: "",
+    salario: 0,
+    horarioInicio: "",
+    horarioFim: "",
+    diasAtendimento: [],
+    formacao: "",
+    experiencia: "",
+    certificacoes: "",
+    endereco: "",
+    emergenciaContato: "",
+    emergenciaTelefone: "",
   });
 
   useEffect(() => {
@@ -102,20 +139,48 @@ export default function Professores() {
       setFormData({
         nome: professor.nome,
         cpf: professor.cpf,
+        dataNascimento: professor.dataNascimento,
+        sexo: professor.sexo,
         especialidade: professor.especialidade,
         telefone: professor.telefone,
         email: professor.email,
         cref: professor.cref,
+        regimeContratacao: professor.regimeContratacao,
+        dataAdmissao: professor.dataAdmissao,
+        salario: professor.salario,
+        horarioInicio: professor.horarioInicio,
+        horarioFim: professor.horarioFim,
+        diasAtendimento: professor.diasAtendimento,
+        formacao: professor.formacao,
+        experiencia: professor.experiencia,
+        certificacoes: professor.certificacoes,
+        endereco: professor.endereco,
+        emergenciaContato: professor.emergenciaContato,
+        emergenciaTelefone: professor.emergenciaTelefone,
       });
     } else {
       setEditingProfessor(null);
       setFormData({
         nome: "",
         cpf: "",
+        dataNascimento: "",
+        sexo: "",
         especialidade: "",
         telefone: "",
         email: "",
         cref: "",
+        regimeContratacao: "",
+        dataAdmissao: "",
+        salario: 0,
+        horarioInicio: "",
+        horarioFim: "",
+        diasAtendimento: [],
+        formacao: "",
+        experiencia: "",
+        certificacoes: "",
+        endereco: "",
+        emergenciaContato: "",
+        emergenciaTelefone: "",
       });
     }
     setIsDialogOpen(true);
@@ -140,6 +205,23 @@ export default function Professores() {
       setDeletingId(null);
     }
   };
+
+  const toggleDiaAtendimento = (dia: string) => {
+    const dias = formData.diasAtendimento || [];
+    if (dias.includes(dia)) {
+      setFormData({
+        ...formData,
+        diasAtendimento: dias.filter((d) => d !== dia),
+      });
+    } else {
+      setFormData({
+        ...formData,
+        diasAtendimento: [...dias, dia],
+      });
+    }
+  };
+
+  const diasSemana = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado", "Domingo"];
 
   return (
     <DashboardLayout>
@@ -181,18 +263,26 @@ export default function Professores() {
                     <p className="text-sm font-medium">{professor.especialidade}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-muted-foreground">CREF</p>
-                    <p className="text-sm font-medium">{professor.cref || "—"}</p>
+                    <p className="text-xs text-muted-foreground">Regime</p>
+                    <p className="text-sm font-medium capitalize">{professor.regimeContratacao || "—"}</p>
                   </div>
                   <div>
                     <p className="text-xs text-muted-foreground">Email</p>
                     <p className="text-sm font-medium">{professor.email}</p>
                   </div>
-                  <div>
-                    <p className="text-xs text-muted-foreground">Telefone</p>
-                    <p className="text-sm font-medium">{professor.telefone || "—"}</p>
-                  </div>
                   <div className="flex gap-2 pt-4">
+                    <Link href={`/professores/${professor.id}`}>
+                      <a className="flex-1">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="w-full brutal-button"
+                        >
+                          <Eye className="w-4 h-4 mr-2" />
+                          Perfil
+                        </Button>
+                      </a>
+                    </Link>
                     <Button
                       onClick={() => openDialog(professor)}
                       variant="outline"
@@ -219,7 +309,7 @@ export default function Professores() {
         )}
 
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogContent className="sm:max-w-[500px]">
+          <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle className="text-2xl">
                 {editingProfessor ? "Editar Professor" : "Novo Professor"}
@@ -227,64 +317,263 @@ export default function Professores() {
             </DialogHeader>
             <form onSubmit={handleSubmit}>
               <div className="space-y-4 py-4">
-                <div>
-                  <Label htmlFor="nome">Nome *</Label>
-                  <Input
-                    id="nome"
-                    value={formData.nome}
-                    onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
-                    required
-                  />
+                {/* Seção: Dados Pessoais */}
+                <div className="border-b border-border pb-4">
+                  <h3 className="font-semibold text-foreground mb-3">Dados Pessoais</h3>
+                  <div className="space-y-3">
+                    <div>
+                      <Label htmlFor="nome">Nome *</Label>
+                      <Input
+                        id="nome"
+                        value={formData.nome}
+                        onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
+                        required
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <Label htmlFor="cpf">CPF *</Label>
+                        <Input
+                          id="cpf"
+                          value={formData.cpf}
+                          onChange={(e) => setFormData({ ...formData, cpf: e.target.value })}
+                          placeholder="000.000.000-00"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="dataNascimento">Data de Nascimento</Label>
+                        <Input
+                          id="dataNascimento"
+                          type="date"
+                          value={formData.dataNascimento}
+                          onChange={(e) =>
+                            setFormData({ ...formData, dataNascimento: e.target.value })
+                          }
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <Label htmlFor="sexo">Sexo</Label>
+                      <Select value={formData.sexo} onValueChange={(value) => setFormData({ ...formData, sexo: value })}>
+                        <SelectTrigger id="sexo">
+                          <SelectValue placeholder="Selecione o sexo" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="masculino">Masculino</SelectItem>
+                          <SelectItem value="feminino">Feminino</SelectItem>
+                          <SelectItem value="outro">Outro</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label htmlFor="email">Email *</Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        value={formData.email}
+                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                        required
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="telefone">Telefone</Label>
+                      <Input
+                        id="telefone"
+                        value={formData.telefone}
+                        onChange={(e) => setFormData({ ...formData, telefone: e.target.value })}
+                        placeholder="(00) 00000-0000"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="endereco">Endereço</Label>
+                      <Input
+                        id="endereco"
+                        value={formData.endereco}
+                        onChange={(e) => setFormData({ ...formData, endereco: e.target.value })}
+                      />
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <Label htmlFor="cpf">CPF *</Label>
-                  <Input
-                    id="cpf"
-                    value={formData.cpf}
-                    onChange={(e) => setFormData({ ...formData, cpf: e.target.value })}
-                    placeholder="000.000.000-00"
-                    required
-                  />
+
+                {/* Seção: Profissional */}
+                <div className="border-b border-border pb-4">
+                  <h3 className="font-semibold text-foreground mb-3">Informações Profissionais</h3>
+                  <div className="space-y-3">
+                    <div>
+                      <Label htmlFor="especialidade">Especialidade *</Label>
+                      <Input
+                        id="especialidade"
+                        value={formData.especialidade}
+                        onChange={(e) =>
+                          setFormData({ ...formData, especialidade: e.target.value })
+                        }
+                        placeholder="Ex: Musculação, Funcional, Yoga"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="cref">CREF</Label>
+                      <Input
+                        id="cref"
+                        value={formData.cref}
+                        onChange={(e) => setFormData({ ...formData, cref: e.target.value })}
+                        placeholder="000000-G/SP"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="formacao">Formação</Label>
+                      <Input
+                        id="formacao"
+                        value={formData.formacao}
+                        onChange={(e) => setFormData({ ...formData, formacao: e.target.value })}
+                        placeholder="Ex: Educação Física - UFRJ"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="experiencia">Anos de Experiência</Label>
+                      <Input
+                        id="experiencia"
+                        type="number"
+                        value={formData.experiencia}
+                        onChange={(e) => setFormData({ ...formData, experiencia: e.target.value })}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="certificacoes">Certificações</Label>
+                      <Textarea
+                        id="certificacoes"
+                        value={formData.certificacoes}
+                        onChange={(e) =>
+                          setFormData({ ...formData, certificacoes: e.target.value })
+                        }
+                        placeholder="Ex: Certificação em Pilates, Treinamento Funcional..."
+                        rows={2}
+                      />
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <Label htmlFor="especialidade">Especialidade *</Label>
-                  <Input
-                    id="especialidade"
-                    value={formData.especialidade}
-                    onChange={(e) =>
-                      setFormData({ ...formData, especialidade: e.target.value })
-                    }
-                    placeholder="Ex: Musculação, Funcional, Yoga"
-                    required
-                  />
+
+                {/* Seção: Contratação */}
+                <div className="border-b border-border pb-4">
+                  <h3 className="font-semibold text-foreground mb-3">Regime de Contratação</h3>
+                  <div className="space-y-3">
+                    <div>
+                      <Label htmlFor="regimeContratacao">Regime *</Label>
+                      <Select value={formData.regimeContratacao} onValueChange={(value) => setFormData({ ...formData, regimeContratacao: value })}>
+                        <SelectTrigger id="regimeContratacao">
+                          <SelectValue placeholder="Selecione o regime" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="clt">CLT</SelectItem>
+                          <SelectItem value="freelancer">Freelancer</SelectItem>
+                          <SelectItem value="pj">PJ</SelectItem>
+                          <SelectItem value="estagiario">Estagiário</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label htmlFor="dataAdmissao">Data de Admissão</Label>
+                      <Input
+                        id="dataAdmissao"
+                        type="date"
+                        value={formData.dataAdmissao}
+                        onChange={(e) =>
+                          setFormData({ ...formData, dataAdmissao: e.target.value })
+                        }
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="salario">Salário/Valor Hora (R$)</Label>
+                      <Input
+                        id="salario"
+                        type="number"
+                        step="0.01"
+                        value={formData.salario || ""}
+                        onChange={(e) =>
+                          setFormData({ ...formData, salario: parseFloat(e.target.value) || 0 })
+                        }
+                      />
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <Label htmlFor="cref">CREF</Label>
-                  <Input
-                    id="cref"
-                    value={formData.cref}
-                    onChange={(e) => setFormData({ ...formData, cref: e.target.value })}
-                    placeholder="000000-G/SP"
-                  />
+
+                {/* Seção: Horários */}
+                <div className="border-b border-border pb-4">
+                  <h3 className="font-semibold text-foreground mb-3">Horários</h3>
+                  <div className="space-y-3">
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <Label htmlFor="horarioInicio">Horário de Início</Label>
+                        <Input
+                          id="horarioInicio"
+                          type="time"
+                          value={formData.horarioInicio}
+                          onChange={(e) =>
+                            setFormData({ ...formData, horarioInicio: e.target.value })
+                          }
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="horarioFim">Horário de Fim</Label>
+                        <Input
+                          id="horarioFim"
+                          type="time"
+                          value={formData.horarioFim}
+                          onChange={(e) =>
+                            setFormData({ ...formData, horarioFim: e.target.value })
+                          }
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <Label>Dias de Atendimento</Label>
+                      <div className="grid grid-cols-2 gap-2 mt-2">
+                        {diasSemana.map((dia) => (
+                          <button
+                            key={dia}
+                            type="button"
+                            onClick={() => toggleDiaAtendimento(dia)}
+                            className={`p-2 rounded border-2 transition-all ${
+                              (formData.diasAtendimento || []).includes(dia)
+                                ? "bg-primary text-primary-foreground border-primary"
+                                : "bg-background border-border hover:border-primary"
+                            }`}
+                          >
+                            {dia}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
                 </div>
+
+                {/* Seção: Emergência */}
                 <div>
-                  <Label htmlFor="email">Email *</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    required
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="telefone">Telefone</Label>
-                  <Input
-                    id="telefone"
-                    value={formData.telefone}
-                    onChange={(e) => setFormData({ ...formData, telefone: e.target.value })}
-                    placeholder="(00) 00000-0000"
-                  />
+                  <h3 className="font-semibold text-foreground mb-3">Contato de Emergência</h3>
+                  <div className="space-y-3">
+                    <div>
+                      <Label htmlFor="emergenciaContato">Nome</Label>
+                      <Input
+                        id="emergenciaContato"
+                        value={formData.emergenciaContato}
+                        onChange={(e) =>
+                          setFormData({ ...formData, emergenciaContato: e.target.value })
+                        }
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="emergenciaTelefone">Telefone</Label>
+                      <Input
+                        id="emergenciaTelefone"
+                        value={formData.emergenciaTelefone}
+                        onChange={(e) =>
+                          setFormData({ ...formData, emergenciaTelefone: e.target.value })
+                        }
+                        placeholder="(00) 00000-0000"
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
               <DialogFooter>
