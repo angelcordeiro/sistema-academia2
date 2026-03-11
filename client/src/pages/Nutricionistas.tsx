@@ -38,6 +38,15 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Link } from "wouter";
 
+// Funções de validação
+const formatCPF = (value: string) => {
+  return value.replace(/\D/g, "").slice(0, 11);
+};
+
+const formatTelefone = (value: string) => {
+  return value.replace(/\D/g, "").slice(0, 11);
+};
+
 interface Nutricionista {
   id: string;
   nome: string;
@@ -332,12 +341,15 @@ export default function Nutricionistas() {
                     </div>
                     <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <Label htmlFor="cpf">CPF *</Label>
+                        <Label htmlFor="cpf">CPF * (11 dígitos)</Label>
                         <Input
                           id="cpf"
+                          type="text"
+                          inputMode="numeric"
                           value={formData.cpf}
-                          onChange={(e) => setFormData({ ...formData, cpf: e.target.value })}
-                          placeholder="000.000.000-00"
+                          onChange={(e) => setFormData({ ...formData, cpf: formatCPF(e.target.value) })}
+                          placeholder="00000000000"
+                          maxLength={11}
                           required
                         />
                       </div>
@@ -377,12 +389,15 @@ export default function Nutricionistas() {
                       />
                     </div>
                     <div>
-                      <Label htmlFor="telefone">Telefone</Label>
+                      <Label htmlFor="telefone">Telefone (10-11 dígitos)</Label>
                       <Input
                         id="telefone"
+                        type="text"
+                        inputMode="numeric"
                         value={formData.telefone}
-                        onChange={(e) => setFormData({ ...formData, telefone: e.target.value })}
-                        placeholder="(00) 00000-0000"
+                        onChange={(e) => setFormData({ ...formData, telefone: formatTelefone(e.target.value) })}
+                        placeholder="00000000000"
+                        maxLength={11}
                       />
                     </div>
                     <div>
