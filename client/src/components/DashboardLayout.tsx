@@ -5,7 +5,7 @@
  */
 
 import { Link, useLocation } from "wouter";
-import { Dumbbell, Users, GraduationCap, ClipboardList, Home } from "lucide-react";
+import { Dumbbell, Users, GraduationCap, ClipboardList, Home, Apple, Pill } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface DashboardLayoutProps {
@@ -17,6 +17,8 @@ const navItems = [
   { path: "/alunos", label: "Alunos", icon: Users },
   { path: "/professores", label: "Professores", icon: GraduationCap },
   { path: "/treinos", label: "Treinos", icon: ClipboardList },
+  { path: "/nutricionistas", label: "Nutricionistas", icon: Apple },
+  { path: "/suplementos", label: "Suplementos", icon: Pill },
 ];
 
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
